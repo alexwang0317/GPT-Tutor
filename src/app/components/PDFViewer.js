@@ -4,14 +4,21 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
 
+// Dynamically import PDF components with loading fallback
 const PdfLoader = dynamic(
   () => import('react-pdf-highlighter').then(mod => mod.PdfLoader),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => <div className="w-full h-full flex items-center justify-center">Loading PDF components...</div>
+  }
 );
 
 const PdfHighlighter = dynamic(
   () => import('react-pdf-highlighter').then(mod => mod.PdfHighlighter),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => <div className="w-full h-full flex items-center justify-center">Loading highlighter...</div>
+  }
 );
 
 function PDFViewer() {
@@ -21,11 +28,24 @@ function PDFViewer() {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [pdfError, setPdfError] = useState(null);
 
+  // Make sure your PDF URL is correct and the file exists in the public directory
   const url = '/sample.pdf';
 
   useEffect(() => {
     setIsClient(true);
+
+    // Verify if the PDF file exists
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          setPdfError(`PDF file not found. Status: ${response.status}`);
+        }
+      })
+      .catch(err => {
+        setPdfError(`Error loading PDF: ${err.message}`);
+      });
 
     function handleKeyDown(event) {
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'KeyE') {
@@ -40,7 +60,7 @@ function PDFViewer() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [url]);
 
   const onSelectionFinished = async (position, content, hideTipAndSelection) => {
     const selectedText = content.text;
@@ -60,8 +80,28 @@ function PDFViewer() {
     }
   };
 
+  // Show loading state during client-side hydration
   if (!isClient) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="text-lg">Initializing PDF viewer...</div>
+      </div>
+    );
+  }
+
+  // Show error if PDF failed to load
+  if (pdfError) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="bg-red-100 text-red-700 p-4 rounded-lg max-w-lg text-center">
+          <h2 className="font-bold mb-2">PDF Loading Error</h2>
+          <p>{pdfError}</p>
+          <p className="mt-2 text-sm">
+            Please make sure the PDF file exists in the public directory and the path is correct.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -79,7 +119,18 @@ function PDFViewer() {
 
       <main className="flex flex-col gap-8 items-center sm:items-start w-full">
         <div className="relative w-full" style={{ height: '80vh', position: 'relative' }}>
-          <PdfLoader url={url} beforeLoad={<div>Loading PDF...</div>}>
+          <PdfLoader 
+            url={url} 
+            beforeLoad={
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-lg">Loading PDF...</div>
+              </div>
+            }
+            onError={(error) => {
+              console.error('PDF loading error:', error);
+              setPdfError(`Failed to load PDF: ${error.message}`);
+            }}
+          >
             {(pdfDocument) => (
               <PdfHighlighter
                 pdfDocument={pdfDocument}
