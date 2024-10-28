@@ -1,21 +1,20 @@
 // app/api/explain/route.js
 
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 
-// Initialize the OpenAI client
-const configuration = new Configuration({
+// Initialize the OpenAI client with the new v4 syntax
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 export async function POST(request) {
   try {
     const { text } = await request.json();
 
-    // Make the API call to OpenAI
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-4o-mini', // or 'gpt-4' if you have access
+    // Make the API call using the new v4 syntax
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4', // Updated model name
       messages: [
         {
           role: 'user',

@@ -1,6 +1,7 @@
 // pages/api/explain.js
 
 import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';  // Updated import
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -22,8 +23,8 @@ export default async function handler(req, res) {
 
   try {
     // Make the API call to OpenAI
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-4o-mini', // Use 'gpt-4' if you have access
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
