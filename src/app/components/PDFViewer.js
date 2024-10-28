@@ -24,16 +24,12 @@ function PDFViewer() {
 
   useEffect(() => {
     setIsClient(true);
-    let lastTap = 0;
     
     function handleKeyDown(event) {
-      if (event.code === 'Space') {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTap;
-        if (tapLength < 500 && tapLength > 0) {
-          setSelectionMode(true);
-        }
-        lastTap = currentTime;
+      // Check for Command (Mac) or Control (Windows) + L
+      if ((event.metaKey || event.ctrlKey) && event.code === 'KeyL') {
+        event.preventDefault(); // Prevent default browser behavior
+        setSelectionMode(true);
       }
     }
 
