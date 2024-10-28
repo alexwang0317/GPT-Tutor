@@ -26,8 +26,8 @@ function PDFViewer() {
     setIsClient(true);
     
     function handleKeyDown(event) {
-      // Check for Command (Mac) or Control (Windows) + L
-      if ((event.metaKey || event.ctrlKey) && event.code === 'KeyL') {
+      // Check for Command/Control + Shift + Space
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'Space') {
         event.preventDefault(); // Prevent default browser behavior
         setSelectionMode(true);
       }
