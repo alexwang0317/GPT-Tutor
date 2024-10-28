@@ -26,9 +26,10 @@ function PDFViewer() {
     setIsClient(true);
     
     function handleKeyDown(event) {
+      console.log(`Key pressed: ${event.code}, Meta: ${event.metaKey}, Ctrl: ${event.ctrlKey}, Shift: ${event.shiftKey}`);
       // Check for Command/Control + Shift + E
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'KeyE') {
-        event.preventDefault(); // Prevent default behavior, if any
+        event.preventDefault();
         console.log('Selection mode activated'); // Debugging line
         setSelectionMode((prevMode) => !prevMode); // Toggle selection mode
       }
@@ -41,7 +42,7 @@ function PDFViewer() {
   const onSelectionFinished = async (position, content, hideTipAndSelection) => {
     const selectedText = content.text;
     hideTipAndSelection();
-    setSelectionMode(false);
+    setSelectionMode(false); // Turn off selection mode after use
 
     try {
       const response = await axios.post('/api/explain', { text: selectedText });
@@ -63,7 +64,7 @@ function PDFViewer() {
             {(pdfDocument) => (
               <PdfHighlighter
                 pdfDocument={pdfDocument}
-                enableAreaSelection={() => selectionMode}
+                enableAreaSelection={() => selectionMode} // This relies on selectionMode
                 onSelectionFinished={onSelectionFinished}
                 highlights={highlights}
               />
