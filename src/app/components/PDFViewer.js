@@ -27,9 +27,10 @@ function PDFViewer() {
     
     function handleKeyDown(event) {
       // Check for Command/Control + Shift + Space
-      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'Space') {
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === ' ') {
         event.preventDefault(); // Prevent default browser behavior
-        setSelectionMode(true);
+        console.log('Selection mode activated'); // Debugging line
+        setSelectionMode((prevMode) => !prevMode); // Toggle selection mode
       }
     }
 
