@@ -19,6 +19,9 @@ function PDFViewer() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const url = '/sample.pdf';
 
   useEffect(() => {
@@ -41,6 +44,9 @@ function PDFViewer() {
 
   const onSelectionFinished = async (position, content, hideTipAndSelection) => {
     const selectedText = content.text;
+    setIsLoading(true);
+    setExplanation('');
+    setError(null);
 
     try {
       const response = await axios.post('/api/explain', { text: selectedText });
@@ -48,6 +54,9 @@ function PDFViewer() {
       hideTipAndSelection();
     } catch (error) {
       console.error('Error fetching explanation:', error);
+      setError('An error occurred while fetching the explanation.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,10 +66,14 @@ function PDFViewer() {
 
   return (
     <div className="grid grid-rows-[auto_1fr_auto] items-center justify-items-center min-h-screen p-8 pb-20 gap-8 sm:p-20">
-      {/* Custom Selection Mode Indicator */}
-      {selectionMode && (
+      {/* Selection Mode Indicator */}
+      {selectionMode ? (
         <div className="w-full max-w-2xl bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800">
-          Selection Mode Active - Click and drag to select areas
+          Selection Mode Active - Click and drag to select text
+        </div>
+      ) : (
+        <div className="w-full max-w-2xl bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-800">
+          Selection Mode Inactive - Press {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'} + Shift + E to activate
         </div>
       )}
 
@@ -78,10 +91,22 @@ function PDFViewer() {
           </PdfLoader>
         </div>
 
+        {isLoading && (
+          <div className="mt-4 p-4 bg-gray-100 text-gray-700 rounded shadow">
+            Generating explanation...
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 p-4 bg-red-100 text-red-700 rounded shadow">
+            {error}
+          </div>
+        )}
+
         {explanation && (
           <div className="mt-4 p-4 bg-white rounded shadow">
             <h2 className="text-xl font-bold mb-2">Explanation</h2>
-            <p className="text-gray-700">{explanation}</p>
+            <p className="text-gray-700 whitespace-pre-wrap">{explanation}</p>
           </div>
         )}
       </main>
