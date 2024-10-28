@@ -23,23 +23,25 @@ function PDFViewer() {
 
   useEffect(() => {
     setIsClient(true);
-    
+
     function handleKeyDown(event) {
-      // Change the condition to check for the 'E' key
-      if ((event.metaKey || event.ctrlKey) && event.code === 'KeyE') {
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'KeyE') {
         event.preventDefault();
-        setSelectionMode(prev => !prev);
-        console.log('Selection mode toggled to:', !selectionMode);
+        setSelectionMode(prev => {
+          const newValue = !prev;
+          console.log('Selection mode toggled to:', newValue);
+          return newValue;
+        });
       }
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectionMode]);
+  }, []);
 
   const onSelectionFinished = async (position, content, hideTipAndSelection) => {
     const selectedText = content.text;
-    
+
     try {
       const response = await axios.post('/api/explain', { text: selectedText });
       setExplanation(response.data.explanation);
@@ -61,9 +63,9 @@ function PDFViewer() {
           Selection Mode Active - Click and drag to select areas
         </div>
       )}
-      
+
       <main className="flex flex-col gap-8 items-center sm:items-start w-full">
-        <div className="relative w-full" style={{ height: "80vh" }}>
+        <div className="relative w-full" style={{ height: '80vh' }}>
           <PdfLoader url={url} beforeLoad={<div>Loading PDF...</div>}>
             {(pdfDocument) => (
               <PdfHighlighter
@@ -75,7 +77,7 @@ function PDFViewer() {
             )}
           </PdfLoader>
         </div>
-        
+
         {explanation && (
           <div className="mt-4 p-4 bg-white rounded shadow">
             <h2 className="text-xl font-bold mb-2">Explanation</h2>
@@ -86,7 +88,7 @@ function PDFViewer() {
 
       {/* Keyboard Shortcut Reminder */}
       <div className="text-sm text-gray-500">
-        Press {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'} + Shift + Space to toggle selection mode
+        Press {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'} + Shift + E to toggle selection mode
       </div>
     </div>
   );
