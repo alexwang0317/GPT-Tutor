@@ -1,24 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PdfLoader, PdfHighlighter } from 'react-pdf-highlighter';
+import dynamic from 'next/dynamic';
 import axios from 'axios';
-import Image from "next/image";
+
+// Dynamically import react-pdf-highlighter with no SSR
+const PdfLoader = dynamic(
+  () => import('react-pdf-highlighter').then(mod => mod.PdfLoader),
+  { ssr: false }
+);
+
+const PdfHighlighter = dynamic(
+  () => import('react-pdf-highlighter').then(mod => mod.PdfHighlighter),
+  { ssr: false }
+);
 
 export default function PDFViewer() {
   const [highlights, setHighlights] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [explanation, setExplanation] = useState('');
+  const [isClient, setIsClient] = useState(false);
   const url = '/sample.pdf';
 
   useEffect(() => {
+    setIsClient(true);
+    
     let lastTap = 0;
-
     function handleKeyDown(event) {
       if (event.code === 'Space') {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTap;
-
+        
         if (tapLength < 500 && tapLength > 0) {
           setSelectionMode(true);
         }
@@ -30,7 +42,7 @@ export default function PDFViewer() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  async function onSelectionFinished(position, content, hideTipAndSelection) {
+  const onSelectionFinished = async (position, content, hideTipAndSelection) => {
     const selectedText = content.text;
     hideTipAndSelection();
     setSelectionMode(false);
@@ -41,6 +53,10 @@ export default function PDFViewer() {
     } catch (error) {
       console.error('Error fetching explanation:', error);
     }
+  };
+
+  if (!isClient) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -60,13 +76,12 @@ export default function PDFViewer() {
         </div>
         
         {explanation && (
-          <div className="explanation">
-            <h2>Explanation</h2>
-            <p>{explanation}</p>
+          <div className="explanation mt-4 p-4 bg-white rounded shadow">
+            <h2 className="text-xl font-bold mb-2">Explanation</h2>
+            <p className="text-gray-700">{explanation}</p>
           </div>
         )}
       </main>
     </div>
   );
 }
-

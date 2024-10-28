@@ -1,7 +1,8 @@
-'use client';
-
-import PDFViewer from './components/PDFViewer';
-
 export default function Home() {
-  return <PDFViewer />;
+  return (
+    <div className="container mx-auto">
+      {/* @ts-expect-error Async Server Component */}
+      <PDFViewer />
+    </div>
+  );
 }
