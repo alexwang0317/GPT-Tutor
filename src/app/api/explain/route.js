@@ -14,7 +14,7 @@ export async function POST(request) {
 
     // Make the API call using the new v4 syntax
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4', // Updated model name
+      model: 'gpt-4o-mini', // Updated model name
       messages: [
         {
           role: 'user',
@@ -23,7 +23,7 @@ export async function POST(request) {
       ],
     });
 
-    const explanation = completion.data.choices[0].message.content;
+    const explanation = completion.choices[0].message.content;
     return NextResponse.json({ explanation });
   } catch (error) {
     console.error('Error fetching explanation:', error);

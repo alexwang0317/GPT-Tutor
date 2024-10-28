@@ -40,15 +40,13 @@ export default function Home() {
     sendToGPT4OS(selectedText);
   }
 
-  function sendToGPT4OS(selectedText) {
-    axios
-      .post('/api/explain', { text: selectedText })
-      .then((response) => {
-        setExplanation(response.data.explanation);
-      })
-      .catch((error) => {
-        console.error('Error fetching explanation:', error);
-      });
+  async function sendToGPT4OS(selectedText) {
+    try {
+      const response = await axios.post('/api/explain', { text: selectedText });
+      setExplanation(response.data.explanation);
+    } catch (error) {
+      console.error('Error fetching explanation:', error);
+    }
   }
 
   return (

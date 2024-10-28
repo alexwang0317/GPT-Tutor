@@ -1,7 +1,6 @@
 // pages/api/explain.js
 
-import { Configuration, OpenAIApi } from 'openai';
-import OpenAI from 'openai';  // Updated import
+import OpenAI from 'openai';
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -16,15 +15,12 @@ export default async function handler(req, res) {
   }
 
   // Initialize the OpenAI client with configuration
-  const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
+  const openai = new OpenAI();  // apiKey will be automatically read from process.env.OPENAI_API_KEY
 
   try {
     // Make the API call to OpenAI
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4',
       messages: [
         {
           role: 'system',
@@ -38,7 +34,7 @@ export default async function handler(req, res) {
     });
 
     // Extract the assistant's reply
-    const explanation = completion.data.choices[0].message.content;
+    const explanation = completion.choices[0].message.content;
 
     return res.status(200).json({ explanation });
   } catch (error) {
