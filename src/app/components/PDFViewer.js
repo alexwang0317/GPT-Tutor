@@ -26,9 +26,9 @@ function PDFViewer() {
     setIsClient(true);
     
     function handleKeyDown(event) {
-      // Check for Command/Control + Shift + Space
-      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === ' ') {
-        event.preventDefault(); // Prevent default browser behavior
+      // Check for Command/Control + Shift + E
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'KeyE') {
+        event.preventDefault(); // Prevent default behavior, if any
         console.log('Selection mode activated'); // Debugging line
         setSelectionMode((prevMode) => !prevMode); // Toggle selection mode
       }
