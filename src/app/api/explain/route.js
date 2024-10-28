@@ -14,7 +14,7 @@ export async function POST(request) {
 
     // Make the API call using the new v4 syntax
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Updated model name
+      model: 'gpt-3.5-turbo', // Updated model name
       messages: [
         {
           role: 'user',
