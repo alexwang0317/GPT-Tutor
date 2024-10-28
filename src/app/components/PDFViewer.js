@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
 
-// Dynamically import react-pdf-highlighter with no SSR
+// Dynamically import react-pdf-highlighter components
 const PdfLoader = dynamic(
   () => import('react-pdf-highlighter').then(mod => mod.PdfLoader),
   { ssr: false }
@@ -15,7 +15,7 @@ const PdfHighlighter = dynamic(
   { ssr: false }
 );
 
-export default function PDFViewer() {
+function PDFViewer() {
   const [highlights, setHighlights] = useState([]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [explanation, setExplanation] = useState('');
@@ -24,13 +24,12 @@ export default function PDFViewer() {
 
   useEffect(() => {
     setIsClient(true);
-    
     let lastTap = 0;
+    
     function handleKeyDown(event) {
       if (event.code === 'Space') {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTap;
-        
         if (tapLength < 500 && tapLength > 0) {
           setSelectionMode(true);
         }
@@ -85,3 +84,5 @@ export default function PDFViewer() {
     </div>
   );
 }
+
+export default PDFViewer;
