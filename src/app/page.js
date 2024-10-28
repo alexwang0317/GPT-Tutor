@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { PdfLoader, PdfHighlighter } from 'react-pdf-highlighter';
 import axios from 'axios';
+import OpenAI from 'openai';  // Add this line
 
 export default function Home() {
   const [highlights, setHighlights] = useState([]);
