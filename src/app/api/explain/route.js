@@ -11,6 +11,14 @@ const openai = new OpenAI({
 export async function POST(request) {
   try {
     const { text } = await request.json();
+    
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OpenAI API key is missing');
+      return NextResponse.json(
+        { error: 'OpenAI API key is not configured' },
+        { status: 500 }
+      );
+    }
 
     // Make the API call using the new v4 syntax
     const completion = await openai.chat.completions.create({
