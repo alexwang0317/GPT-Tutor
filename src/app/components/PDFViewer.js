@@ -28,7 +28,11 @@ function PDFViewer() {
     setIsClient(true);
 
     function handleKeyDown(event) {
-      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.code === 'KeyE') {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey &&
+        event.code === 'KeyE'
+      ) {
         event.preventDefault();
         setSelectionMode(prev => {
           const newValue = !prev;
@@ -43,20 +47,25 @@ function PDFViewer() {
   }, []);
 
   const onSelectionFinished = async (position, content, hideTipAndSelection) => {
-    const selectedText = content.text;
-    setIsLoading(true);
-    setExplanation('');
-    setError(null);
+    // Check if text is selected
+    if (content.text) {
+      const selectedText = content.text;
+      setIsLoading(true);
+      setExplanation('');
+      setError(null);
 
-    try {
-      const response = await axios.post('/api/explain', { text: selectedText });
-      setExplanation(response.data.explanation);
-      hideTipAndSelection();
-    } catch (error) {
-      console.error('Error fetching explanation:', error);
-      setError('An error occurred while fetching the explanation.');
-    } finally {
-      setIsLoading(false);
+      try {
+        const response = await axios.post('/api/explain', { text: selectedText });
+        setExplanation(response.data.explanation);
+        hideTipAndSelection();
+      } catch (error) {
+        console.error('Error fetching explanation:', error);
+        setError('An error occurred while fetching the explanation.');
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      console.log('No text selected.');
     }
   };
 
@@ -80,10 +89,10 @@ function PDFViewer() {
       <main className="flex flex-col gap-8 items-center sm:items-start w-full">
         <div className="relative w-full" style={{ height: '80vh' }}>
           <PdfLoader url={url} beforeLoad={<div>Loading PDF...</div>}>
-            {(pdfDocument) => (
+            {pdfDocument => (
               <PdfHighlighter
                 pdfDocument={pdfDocument}
-                enableAreaSelection={selectionMode}
+                enableAreaSelection={event => false} // Disable area selection to allow text selection
                 onSelectionFinished={onSelectionFinished}
                 highlights={highlights}
               />
